@@ -25,3 +25,7 @@ This variable defines the Azure region where the resource will be created.
 The default value is "eastus".
 DESCRIPTION
 }
+
+variable "rules" {
+  
+}
