@@ -63,7 +63,7 @@ Description: n/a
 Type:
 
 ```hcl
-list(object({
+map(object({
     name                       = "test123"
     priority                   = 100
     direction                  = "Outbound"
