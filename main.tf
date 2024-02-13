@@ -18,6 +18,7 @@ resource "azurerm_network_security_group" "this" {
   #     destination_address_prefix = "*"
   #   }
 
+  tags = var.tags
 
 }
 

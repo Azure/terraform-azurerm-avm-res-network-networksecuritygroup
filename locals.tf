@@ -1,5 +1,4 @@
 # TODO: insert locals here.
-# TODO: insert locals here.
 locals {
   enable_telemetry = true
 }
