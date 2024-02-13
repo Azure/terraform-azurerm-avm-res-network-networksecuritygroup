@@ -54,7 +54,13 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_rules"></a> [rules](#input\_rules)
+
+Description: n/a
+
+Type: `any`
 
 ## Optional Inputs
 
