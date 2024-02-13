@@ -30,6 +30,7 @@ The following resources are used by this module:
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_network_security_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
+- [azurerm_network_security_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
@@ -50,6 +51,28 @@ Type: `string`
 Description: Name of Network Security Group resource
 
 Type: `string`
+
+### <a name="input_nsgrules"></a> [nsgrules](#input\_nsgrules)
+
+Description: NSG rules to create
+
+Type:
+
+```hcl
+map(object(
+    {
+      nsg_rule_name                       = list(string) # (Required) Name of NSG rule.
+      nsg_rule_priority                   = list(string) # (Required) NSG rule priority.
+      nsg_rule_direction                  = list(string) # (Required) NSG rule direction. Possible values are `Inbound` and `Outbound`.
+      nsg_rule_access                     = list(string) # (Required) NSG rule access. Possible values are `Allow` and `Deny`.
+      nsg_rule_protocol                   = list(string) # (Required) NSG rule protocol. Possible values are `Tcp`, `Udp`, `Icmp`, `Esp`, `Asterisk`.
+      nsg_rule_source_port_range          = list(string) # (Required) NSG rule source port range.
+      nsg_rule_destination_port_range     = list(string) # (Required) NSG rule destination port range.
+      nsg_rule_source_address_prefix      = list(string) # (Required) NSG rule source address prefix.
+      nsg_rule_destination_address_prefix = list(string) # (Required) NSG rule destination address prefix.
+    }
+  ))
+```
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
