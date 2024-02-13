@@ -26,16 +26,16 @@ The default value is "eastus".
 DESCRIPTION
 }
 
- variable "rules" {
-    type = list(object({
-      name                        = "test123"
-      priority                    = 100
-      direction                   = "Outbound"
-      access                      = "Allow"
-      protocol                    = "Tcp"
-      source_port_range           = "*"
-      destination_port_range      = "*"
-      source_address_prefix       = "*"
-      destination_address_prefix  = "*"
-    }))
-  }
+variable "rules" {
+  type = list(object({
+    name                       = "test123"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }))
+}
