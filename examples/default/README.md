@@ -26,6 +26,7 @@ module "nsg" {
   resource_group_name = azurerm_resource_group.this.name
   name                = module.naming.network_security_group.name_unique
   location            = var.location
+  nsgrules            = var.rules
 }
 ```
 
@@ -53,7 +54,27 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_rules"></a> [rules](#input\_rules)
+
+Description: n/a
+
+Type:
+
+```hcl
+list(object({
+    name                       = "test123"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }))
+```
 
 ## Optional Inputs
 
