@@ -25,17 +25,3 @@ This variable defines the Azure region where the resource will be created.
 The default value is "eastus".
 DESCRIPTION
 }
-
-variable "rules" {
-  type = map(object({
-    nsg_rule_name                       = "test123"
-    nsg_rule_priority                   = 100
-    nsg_rule_direction                  = "Outbound"
-    nsg_rule_access                     = "Allow"
-    nsg_rule_protocol                   = "Tcp"
-    nsg_rule_source_port_range          = "*"
-    nsg_rule_destination_port_range     = "*"
-    nsg_rule_source_address_prefix      = "*"
-    nsg_rule_destination_address_prefix = "*"
-  }))
-}
