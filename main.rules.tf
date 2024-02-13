@@ -10,8 +10,8 @@ resource "azurerm_network_security_rule" "this" {
   destination_port_range      = each.value.nsg_rule_destination_port_range
   source_address_prefix       = each.value.nsg_rule_source_address_prefix
   destination_address_prefix  = each.value.nsg_rule_destination_address_prefix
-  resource_group_name         = azurerm_resource_group.example.name
-  network_security_group_name = azurerm_network_security_group.example.name
+  resource_group_name         = azurerm_resource_group.this.name
+  network_security_group_name = azurerm_network_security_group.this.name
 
   # Do not remove this `depends_on` block. It is required to ensure the NSG is created before the rule.
   depends_on = [azurerm_network_security_group.this]
