@@ -26,11 +26,8 @@ The default value is "eastus".
 DESCRIPTION
 }
 
-variable "rules" {
-  type        = map(object({
-  }))
-  default     = {
-    test123 = {
+ variable "rules" {
+    type = list(object({
       name                        = "test123"
       priority                    = 100
       direction                   = "Outbound"
@@ -40,6 +37,5 @@ variable "rules" {
       destination_port_range      = "*"
       source_address_prefix       = "*"
       destination_address_prefix  = "*"
-    }
-  } 
-}
+    }))
+  }
