@@ -20,4 +20,5 @@ module "nsg" {
   resource_group_name = azurerm_resource_group.this.name
   name                = module.naming.network_security_group.name_unique
   location            = var.location
+  nsgrules            = var.rules
 }

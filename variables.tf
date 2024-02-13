@@ -48,9 +48,6 @@ variable "nsgrules" {
   description = "NSG rules to create"
 }
 
-
-
-
 variable "tags" {
   type        = map(any)
   description = "Map of tags to assign to the deployed resource."

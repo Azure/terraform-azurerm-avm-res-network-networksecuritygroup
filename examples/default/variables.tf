@@ -25,3 +25,21 @@ This variable defines the Azure region where the resource will be created.
 The default value is "eastus".
 DESCRIPTION
 }
+
+variable "rules" {
+  type        = map(object({
+  }))
+  default     = {
+    test123 = {
+      name                        = "test123"
+      priority                    = 100
+      direction                   = "Outbound"
+      access                      = "Allow"
+      protocol                    = "Tcp"
+      source_port_range           = "*"
+      destination_port_range      = "*"
+      source_address_prefix       = "*"
+      destination_address_prefix  = "*"
+    }
+  } 
+}
