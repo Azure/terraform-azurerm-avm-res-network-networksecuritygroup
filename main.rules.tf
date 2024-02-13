@@ -1,7 +1,7 @@
 resource "azurerm_network_security_rule" "this" {
   for_each = var.nsgrules
 
-  name                        = each.value.nsg_rule_name
+  name                        = each.key
   priority                    = each.value.nsg_rule_priority
   direction                   = each.value.nsg_rule_direction
   access                      = each.value.nsg_rule_access

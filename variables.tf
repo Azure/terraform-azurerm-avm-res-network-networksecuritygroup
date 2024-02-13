@@ -34,7 +34,7 @@ variable "location" {
 variable "nsgrules" {
   type = map(object(
     {
-      nsg_rule_name                       = string # (Required) Name of NSG rule.
+      # nsg_rule_name                       = string # (Required) Name of NSG rule.
       nsg_rule_priority                   = number # (Required) NSG rule priority.
       nsg_rule_direction                  = string # (Required) NSG rule direction. Possible values are `Inbound` and `Outbound`.
       nsg_rule_access                     = string # (Required) NSG rule access. Possible values are `Allow` and `Deny`.
