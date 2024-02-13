@@ -27,7 +27,7 @@ DESCRIPTION
 }
 
 variable "rules" {
-  type = list(object({
+  type = map(object({
     name                       = "test123"
     priority                   = 100
     direction                  = "Outbound"
