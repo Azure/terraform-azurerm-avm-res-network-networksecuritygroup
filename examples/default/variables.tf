@@ -27,5 +27,7 @@ DESCRIPTION
 }
 
 variable "rules" {
-
+  description = <<DESCRIPTION
+Variable to define the NSG rules to be created.
+DESCRIPTION
 }

@@ -58,7 +58,7 @@ The following input variables are required:
 
 ### <a name="input_rules"></a> [rules](#input\_rules)
 
-Description: n/a
+Description: Variable to define the NSG rules to be created.
 
 Type: `any`
 
