@@ -87,11 +87,7 @@ Default: `{}`
 
 ## Outputs
 
-The following outputs are exported:
-
-### <a name="output_Created_NSG"></a> [Created\_NSG](#output\_Created\_NSG)
-
-Description: n/a
+No outputs.
 
 ## Modules
 
