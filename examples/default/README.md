@@ -118,7 +118,7 @@ The following outputs are exported:
 
 ### <a name="output_crated_nsg_resource"></a> [crated\_nsg\_resource](#output\_crated\_nsg\_resource)
 
-Description: n/a
+Description: The Azure Network Security Group resource
 
 ## Modules
 
