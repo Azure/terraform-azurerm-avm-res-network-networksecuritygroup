@@ -61,7 +61,6 @@ Type:
 ```hcl
 map(object(
     {
-      # nsg_rule_name                       = string # (Required) Name of NSG rule.
       nsg_rule_priority                   = number # (Required) NSG rule priority.
       nsg_rule_direction                  = string # (Required) NSG rule direction. Possible values are `Inbound` and `Outbound`.
       nsg_rule_access                     = string # (Required) NSG rule access. Possible values are `Allow` and `Deny`.
@@ -182,7 +181,11 @@ Default: `null`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_nsg_resource"></a> [nsg\_resource](#output\_nsg\_resource)
+
+Description: The Azure Network Security Group resource
 
 ## Modules
 
