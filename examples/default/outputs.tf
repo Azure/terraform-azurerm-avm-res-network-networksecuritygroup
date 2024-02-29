@@ -1,3 +1,3 @@
 output "Created_NSG" {
-  value = module.nsg.nsg_resource    
-  }
+  value = module.nsg.nsg_resource
+}
