@@ -1,5 +1,4 @@
-# TODO: insert outputs here.
-output "Created_NSG" {
-  value       = module.nsg.nsg_resource
+output "nsg_resource" {
+  value       = azurerm_network_security_group.this
   description = "The Azure Network Security Group resource"
 }

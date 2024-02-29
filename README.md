@@ -183,7 +183,7 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_Created_NSG"></a> [Created\_NSG](#output\_Created\_NSG)
+### <a name="output_nsg_resource"></a> [nsg\_resource](#output\_nsg\_resource)
 
 Description: The Azure Network Security Group resource
 
