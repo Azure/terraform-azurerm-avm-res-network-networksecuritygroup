@@ -19,8 +19,8 @@ variable "name" {
   type        = string
   description = "Name of Network Security Group resource"
   validation {
-    condition     = can(regex("^[a-z0-9-]{3,24}$", var.name))
-    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
+    condition     = can(regex("^[a-z0-9-_.]{1,80}$", var.name))
+    error_message = "The name must be between 1 and 80 characters long and can only contain lowercase letters, numbers, underscores, periods, and dashes."
   }
 }
 
