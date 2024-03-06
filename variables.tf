@@ -14,13 +14,15 @@ variable "resource_group_name" {
   description = "The resource group where the resources will be deployed."
 }
 
-
 variable "name" {
   type        = string
   description = "Name of Network Security Group resource"
   validation {
-    condition     = can(regex("^[a-z0-9-]{3,24}$", var.name))
-    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
+    condition     = can(regex("^[[:alnum:]]([[:alnum:]_.-]{0,78}?[[:alnum:]_])?$", var.name))
+    error_message = <<EOT
+    The name must be between 1 and 80 characters long and can only contain alphanumerics, underscores, periods, and hyphens.
+    It must start with an alphanumeric and end with an alphanumeric or underscore.
+    EOT
   }
 }
 
