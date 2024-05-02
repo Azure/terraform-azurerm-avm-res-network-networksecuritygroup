@@ -10,6 +10,10 @@ resource "azurerm_network_security_rule" "this" {
   destination_port_range      = each.value.nsg_rule_destination_port_range
   source_address_prefix       = each.value.nsg_rule_source_address_prefix
   destination_address_prefix  = each.value.nsg_rule_destination_address_prefix
+  source_port_ranges           = each.value.nsg_rule_source_port_ranges
+  destination_port_ranges      = each.value.nsg_rule_destination_port_ranges
+  source_address_prefixes       = each.value.nsg_rule_source_address_prefixes
+  destination_address_prefixes  = each.value.nsg_rule_destination_address_prefixes
   resource_group_name         = var.resource_group_name
   network_security_group_name = azurerm_network_security_group.this.name
 
