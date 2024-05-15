@@ -1,4 +1,4 @@
-variable "network_security_rules" {
+variable "security_rules" {
   type = map(object({
     access                                     = string
     name                                       = string

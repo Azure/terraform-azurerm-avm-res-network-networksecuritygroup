@@ -84,7 +84,7 @@ module "nsg" {
   name                = module.naming.network_security_group.name_unique
   location            = azurerm_resource_group.this.location
 
-  network_security_rules = local.nsg_rules
+  security_rules = local.nsg_rules
 }
 ```
 
