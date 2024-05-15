@@ -3,8 +3,8 @@ resource "azurerm_network_security_rule" "this" {
 
   access                                     = each.value.access
   direction                                  = each.value.direction
-  name                                       = azurerm_network_security_group.this.name
-  network_security_group_name                = each.value.network_security_group_name
+  name                                       = each.value.name
+  network_security_group_name                = azurerm_network_security_group.this.name
   priority                                   = each.value.priority
   protocol                                   = each.value.protocol
   resource_group_name                        = azurerm_network_security_group.this.resource_group_name

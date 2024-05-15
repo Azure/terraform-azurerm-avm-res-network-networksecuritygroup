@@ -98,7 +98,7 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_crated_nsg_resource"></a> [crated\_nsg\_resource](#output\_crated\_nsg\_resource)
+### <a name="output_created_nsg_resource"></a> [created\_nsg\_resource](#output\_created\_nsg\_resource)
 
 Description: The Azure Network Security Group resource
 

@@ -127,6 +127,7 @@ Default: `null`
 ### <a name="input_network_security_rules"></a> [network\_security\_rules](#input\_network\_security\_rules)
 
 Description:  - `access` - (Required) Specifies whether network traffic is allowed or denied. Possible values are `Allow` and `Deny`.
+ - `name` - (Required) Name of the network security rule to be created.
  - `description` - (Optional) A description for this rule. Restricted to 140 characters.
  - `destination_address_prefix` - (Optional) CIDR or destination IP range or * to match any IP. Tags such as `VirtualNetwork`, `AzureLoadBalancer` and `Internet` can also be used. Besides, it also supports all available Service Tags like ‘Sql.WestEurope‘, ‘Storage.EastUS‘, etc. You can list the available service tags with the CLI: ```shell az network list-service-tags --location westcentralus
 ```. For further information please see [Azure CLI
@@ -136,7 +137,6 @@ Description:  - `access` - (Required) Specifies whether network traffic is allow
  - `destination_port_ranges` - (Optional) List of destination ports or port ranges. This is required if `destination_port_range` is not specified.
  - `direction` - (Required) The direction specifies if rule will be evaluated on incoming or outgoing traffic. Possible values are `Inbound` and `Outbound`.
  - `name` - (Required) The name of the security rule. This needs to be unique across all Rules in the Network Security Group. Changing this forces a new resource to be created.
- - `network_security_group_name` - (Required) The name of the Network Security Group that we want to attach the rule to. Changing this forces a new resource to be created.
  - `priority` - (Required) Specifies the priority of the rule. The value can be between 100 and 4096. The priority number must be unique for each rule in the collection. The lower the priority number, the higher the priority of the rule.
  - `protocol` - (Required) Network protocol this rule applies to. Possible values include `Tcp`, `Udp`, `Icmp`, `Esp`, `Ah` or `*` (which matches all).
  - `resource_group_name` - (Required) The name of the resource group in which to create the Network Security Rule. Changing this forces a new resource to be created.
@@ -158,6 +158,7 @@ Type:
 ```hcl
 map(object({
     access                                     = string
+    name                                       = string
     description                                = optional(string)
     destination_address_prefix                 = optional(string)
     destination_address_prefixes               = optional(set(string))
@@ -165,7 +166,6 @@ map(object({
     destination_port_range                     = optional(string)
     destination_port_ranges                    = optional(set(string))
     direction                                  = string
-    network_security_group_name                = string
     priority                                   = number
     protocol                                   = string
     source_address_prefix                      = optional(string)
