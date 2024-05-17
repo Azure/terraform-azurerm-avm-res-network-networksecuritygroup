@@ -1,6 +1,3 @@
-# TODO: insert resources here.
-
-
 resource "azurerm_network_security_group" "this" {
   location            = var.location
   name                = var.name

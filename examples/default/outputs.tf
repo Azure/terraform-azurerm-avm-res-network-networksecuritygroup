@@ -1,4 +1,4 @@
-output "created_nsg_resource" {
-  description = "The Azure Network Security Group resource"
-  value       = module.nsg.id
+output "created_nsg_resource_id" {
+  description = "The Azure Network Security Group resource id"
+  value       = module.nsg.resource_id
 }

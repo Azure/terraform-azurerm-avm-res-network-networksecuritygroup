@@ -98,9 +98,9 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_created_nsg_resource"></a> [created\_nsg\_resource](#output\_created\_nsg\_resource)
+### <a name="output_created_nsg_resource_id"></a> [created\_nsg\_resource\_id](#output\_created\_nsg\_resource\_id)
 
-Description: The Azure Network Security Group resource
+Description: The Azure Network Security Group resource id
 
 ## Modules
 
