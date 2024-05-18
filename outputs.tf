@@ -1,4 +1,14 @@
-output "nsg_resource" {
+output "name" {
+  description = "The name of the Network Security Group resource"
+  value       = azurerm_network_security_group.this.name
+}
+
+output "resource" {
+  description = "The Network Security Group resource"
   value       = azurerm_network_security_group.this
-  description = "The Azure Network Security Group resource"
+}
+
+output "resource_id" {
+  description = "The id of the Network Security Group resource"
+  value       = azurerm_network_security_group.this.id
 }
