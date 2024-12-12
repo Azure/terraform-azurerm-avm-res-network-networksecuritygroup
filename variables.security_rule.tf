@@ -1,7 +1,6 @@
 variable "security_rules" {
   type = map(object({
     access                                     = string
-    name                                       = string
     description                                = optional(string)
     destination_address_prefix                 = optional(string)
     destination_address_prefixes               = optional(set(string))
@@ -9,6 +8,7 @@ variable "security_rules" {
     destination_port_range                     = optional(string)
     destination_port_ranges                    = optional(set(string))
     direction                                  = string
+    name                                       = string
     priority                                   = number
     protocol                                   = string
     source_address_prefix                      = optional(string)
@@ -25,7 +25,6 @@ variable "security_rules" {
   }))
   description = <<DESCRIPTION
  - `access` - (Required) Specifies whether network traffic is allowed or denied. Possible values are `Allow` and `Deny`.
- - `name` - (Required) Name of the network security rule to be created.
  - `description` - (Optional) A description for this rule. Restricted to 140 characters.
  - `destination_address_prefix` - (Optional) CIDR or destination IP range or * to match any IP. Tags such as `VirtualNetwork`, `AzureLoadBalancer` and `Internet` can also be used. Besides, it also supports all available Service Tags like ‘Sql.WestEurope‘, ‘Storage.EastUS‘, etc. You can list the available service tags with the CLI: ```shell az network list-service-tags --location westcentralus```. For further information please see [Azure CLI
  - `destination_address_prefixes` - (Optional) List of destination address prefixes. Tags may not be used. This is required if `destination_address_prefix` is not specified.
