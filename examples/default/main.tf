@@ -1,5 +1,6 @@
 terraform {
   required_version = ">= 1.9, < 2.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -46,8 +47,9 @@ resource "azurerm_resource_group" "this" {
 # This is the module call
 module "nsg" {
   source = "../../"
+
+  location = azurerm_resource_group.this.location
+  name     = module.naming.network_security_group.name_unique
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   resource_group_name = azurerm_resource_group.this.name
-  name                = module.naming.network_security_group.name_unique
-  location            = azurerm_resource_group.this.location
 }
