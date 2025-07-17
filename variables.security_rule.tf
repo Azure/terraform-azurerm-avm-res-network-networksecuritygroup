@@ -23,6 +23,7 @@ variable "security_rules" {
       update = optional(string)
     }))
   }))
+  default     = {}
   description = <<DESCRIPTION
  - `access` - (Required) Specifies whether network traffic is allowed or denied. Possible values are `Allow` and `Deny`.
  - `description` - (Optional) A description for this rule. Restricted to 140 characters.
@@ -48,6 +49,5 @@ variable "security_rules" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Rule.
  - `update` - (Defaults to 30 minutes) Used when updating the Network Security Rule.
 DESCRIPTION
-  default     = {}
   nullable    = false
 }
