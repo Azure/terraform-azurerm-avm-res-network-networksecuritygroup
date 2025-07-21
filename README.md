@@ -66,7 +66,7 @@ Description: A map of diagnostic settings to create on the Key Vault. The map ke
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
 - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
 - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `null`. Note: This property is not supported by all Azure resource types.
 - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
 - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
 - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
@@ -81,7 +81,7 @@ map(object({
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
     metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
+    log_analytics_destination_type           = optional(string, null)
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
