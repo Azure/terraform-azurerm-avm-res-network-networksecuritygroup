@@ -53,5 +53,4 @@ variable "security_rules" {
 Also accepts `null` as an input, which the module evaluates to an empty object (`{}`). This is useful when conditionally creating NSG's using this module.
 
 DESCRIPTION
-  nullable    = true
 }

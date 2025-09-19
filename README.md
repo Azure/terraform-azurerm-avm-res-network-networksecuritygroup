@@ -181,6 +181,9 @@ Description:  - `access` - (Required) Specifies whether network traffic is allow
  - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Rule.
  - `update` - (Defaults to 30 minutes) Used when updating the Network Security Rule.
 
+---  
+Also accepts `null` as an input, which the module evaluates to an empty object (`{}`). This is useful when conditionally creating NSG's using this module.
+
 Type:
 
 ```hcl
