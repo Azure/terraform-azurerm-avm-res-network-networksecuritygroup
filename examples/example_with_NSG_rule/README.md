@@ -87,6 +87,9 @@ module "nsg" {
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   resource_group_name = azurerm_resource_group.this.name
   security_rules      = local.nsg_rules
+  tags = {
+    env = "test"
+  }
 }
 ```
 
