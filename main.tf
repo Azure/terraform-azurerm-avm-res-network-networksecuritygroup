@@ -14,6 +14,10 @@ resource "azurerm_network_security_group" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    ignore_changes = [ security_rules ] # managed via separate security rule resource. This ensures idempotent plans
+  }
 }
 
 resource "azurerm_management_lock" "this" {

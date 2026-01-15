@@ -3,9 +3,9 @@ output "name" {
   value       = azurerm_network_security_group.this.name
 }
 
-output "resource" {
-  description = "The Network Security Group resource"
-  value       = azurerm_network_security_group.this
+output "security_rules" {
+  description = "The Network Security Group Rules"
+  value       = azurerm_network_security_rule.this
 }
 
 output "resource_id" {
