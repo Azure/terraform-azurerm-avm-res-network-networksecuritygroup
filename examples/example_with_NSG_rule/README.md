@@ -65,15 +65,15 @@ locals {
       source_port_range          = "*"
     }
     "rule02" = {
-      name                         = "${module.naming.network_security_rule.name_unique}2"
-      access                       = "Allow"
-      destination_address_prefixes = ["*"]
-      destination_port_ranges      = ["80", "443"]
-      direction                    = "Inbound"
-      priority                     = 200
-      protocol                     = "Tcp"
-      source_address_prefix        = "*"
-      source_port_range            = "*"
+      name                       = "${module.naming.network_security_rule.name_unique}2"
+      access                     = "Allow"
+      destination_address_prefix = "*"
+      destination_port_ranges    = ["80", "443"]
+      direction                  = "Inbound"
+      priority                   = 200
+      protocol                   = "Tcp"
+      source_address_prefix      = "*"
+      source_port_range          = "*"
     }
   }
 }
