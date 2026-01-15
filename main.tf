@@ -14,6 +14,10 @@ resource "azurerm_network_security_group" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    ignore_changes = [security_rule] # managed via separate security rule resource. This ensures idempotent plans
+  }
 }
 
 resource "azurerm_management_lock" "this" {
@@ -23,6 +27,8 @@ resource "azurerm_management_lock" "this" {
   name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
   scope      = azurerm_network_security_group.this.id
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
+
+  depends_on = [azurerm_network_security_rule.this] # Ensure locks are created after security rules. Readonly locks prevent rule creation.
 }
 
 resource "azurerm_role_assignment" "this" {
