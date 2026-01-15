@@ -16,7 +16,7 @@ resource "azurerm_network_security_group" "this" {
   }
 
   lifecycle {
-    ignore_changes = [ security_rules ] # managed via separate security rule resource. This ensures idempotent plans
+    ignore_changes = [security_rules] # managed via separate security rule resource. This ensures idempotent plans
   }
 }
 
