@@ -87,6 +87,9 @@ module "nsg" {
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   resource_group_name = azurerm_resource_group.this.name
   security_rules      = local.nsg_rules
+  tags = {
+    env = "test"
+  }
 }
 ```
 
@@ -121,9 +124,13 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_created_nsg_resource"></a> [created\_nsg\_resource](#output\_created\_nsg\_resource)
+### <a name="output_network_security_group_id"></a> [network\_security\_group\_id](#output\_network\_security\_group\_id)
 
-Description: The Azure Network Security Group resource
+Description: The Azure Network Security Group resource ID
+
+### <a name="output_network_security_group_rules"></a> [network\_security\_group\_rules](#output\_network\_security\_group\_rules)
+
+Description: The Azure Network Security Group resource rules
 
 ## Modules
 

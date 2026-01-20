@@ -257,13 +257,13 @@ The following outputs are exported:
 
 Description: The name of the Network Security Group resource
 
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The Network Security Group resource
-
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The id of the Network Security Group resource
+
+### <a name="output_security_rules"></a> [security\_rules](#output\_security\_rules)
+
+Description: The Network Security Group Rules
 
 ## Modules
 
