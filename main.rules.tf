@@ -1,5 +1,5 @@
 resource "azurerm_network_security_rule" "this" {
-  for_each = var.security_rules
+  for_each = var.enable_inline_rules == true ? {} : var.security_rules
 
   access                                     = each.value.access
   direction                                  = each.value.direction
