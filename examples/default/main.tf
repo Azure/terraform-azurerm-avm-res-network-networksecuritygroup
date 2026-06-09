@@ -22,7 +22,7 @@ provider "azurerm" {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = "0.3.0"
+  version = "0.8.2"
 }
 
 # This allows us to randomize the region for the resource group.
