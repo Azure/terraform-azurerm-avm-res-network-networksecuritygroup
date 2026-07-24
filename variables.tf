@@ -150,3 +150,13 @@ variable "timeouts" {
  - `update` - (Defaults to 30 minutes) Used when updating the Network Security Group.
 EOT
 }
+
+variable "enable_inline_rules" {
+  type        = bool
+  default     = false
+  description = <<DESCRIPTION
+This variable controls whether or not inline rules are created by the module.
+If it is set to true, then no azurerm_network_security_rule objects will be created and instead rules will be fully managed inline.
+DESCRIPTION
+  nullable    = false
+}
