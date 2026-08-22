@@ -49,5 +49,5 @@ variable "security_rules" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Rule.
  - `update` - (Defaults to 30 minutes) Used when updating the Network Security Rule.
 DESCRIPTION
-  nullable    = false
+  nullable    = true
 }
