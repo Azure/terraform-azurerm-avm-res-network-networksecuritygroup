@@ -212,6 +212,15 @@ map(object({
 
 Default: `{}`
 
+### <a name="enable_inline_rules"></a> [enable\_inline\_rules](#enable\_inline\_rules)
+
+Description: This variable controls whether or not the rules are managed inline by the module.  
+If it is set to true, then the module will fully manage the rules inline.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: (Optional) A mapping of tags to assign to the resource.
