@@ -79,7 +79,7 @@ module "nsg" {
   name     = module.naming.network_security_group.name_unique
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry    = false
+  enable_telemetry    = var.enable_telemetry
   security_rules      = local.nsg_rules
   tags = {
     env = "test"
