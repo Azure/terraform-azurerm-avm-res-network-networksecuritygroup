@@ -1,8 +1,32 @@
+locals {
+  inline_rules = var.enable_inline_rules == true ? [for rule in var.security_rules : merge(
+    {
+      access                                     = null
+      direction                                  = null
+      name                                       = null
+      priority                                   = null
+      protocol                                   = null
+      description                                = null
+      destination_address_prefix                 = null
+      destination_address_prefixes               = null
+      destination_application_security_group_ids = null
+      destination_port_range                     = null
+      destination_port_ranges                    = null
+      source_address_prefix                      = null
+      source_address_prefixes                    = null
+      source_application_security_group_ids      = null
+      source_port_range                          = null
+      source_port_ranges                         = null
+    }, rule
+  )] : null
+}
+
 resource "azurerm_network_security_group" "this" {
   location            = var.location
   name                = var.name
   resource_group_name = var.resource_group_name
   tags                = var.tags
+  security_rule       = local.inline_rules
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
