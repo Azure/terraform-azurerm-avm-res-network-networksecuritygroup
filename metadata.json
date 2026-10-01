@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Network Security Group",
+  "moduleDescription": "AVM Resource Module for Network Security Group",
+  "canonicalType": "Microsoft.Network/networkSecurityGroups",
+  "owners": [
+    "maheshbenke"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.6ca7f7e"
+}

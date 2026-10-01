@@ -24,7 +24,6 @@ provider "azurerm" {
   features {}
 }
 
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
@@ -37,6 +36,7 @@ resource "random_integer" "region_index" {
   max = length(module.regions.regions) - 1
   min = 0
 }
+
 ## End of section to provide a random Azure region for the resource group
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -86,7 +86,11 @@ module "nsg" {
   name     = module.naming.network_security_group.name_unique
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   resource_group_name = azurerm_resource_group.this.name
+  enable_telemetry    = var.enable_telemetry
   security_rules      = local.nsg_rules
+  tags = {
+    env = "test"
+  }
 }
 ```
 
@@ -115,15 +119,29 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 
 The following outputs are exported:
 
-### <a name="output_created_nsg_resource"></a> [created\_nsg\_resource](#output\_created\_nsg\_resource)
+### <a name="output_network_security_group_id"></a> [network\_security\_group\_id](#output\_network\_security\_group\_id)
 
-Description: The Azure Network Security Group resource
+Description: The Azure Network Security Group resource ID
+
+### <a name="output_network_security_group_rules"></a> [network\_security\_group\_rules](#output\_network\_security\_group\_rules)
+
+Description: The Azure Network Security Group resource rules
 
 ## Modules
 
