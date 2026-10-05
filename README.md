@@ -3,18 +3,52 @@
 # terraform-azurerm-avm-res-network-networksecuritygroup
 
 NOTE: This module follows the semantic versioning and versions prior to 1.0.0 should be consider pre-release versions.
-This is the Network Security Group resource module for the Azure Verified Modules library. This module deploys a Azure Network Security Group and give availability to manage rules. It leverages the AzureRM provider and sets a number of initial defaults to minimize the overall inputs for simple configurations.
+This is the Network Security Group resource module for the Azure Verified Modules library. This module deploys a Azure Network Security Group and give availability to manage rules. It uses the AzAPI provider and sets a number of initial defaults to minimize the overall inputs for simple configurations.
+
+Security rules are managed as separate child resources, so rules that other configurations or Azure services add to the network security group are left in place. Azure removes every rule that an update to the network security group omits, so whenever the module updates the network security group itself (for example its tags), it re-reads the rules and sends them unchanged.
+
+Terraform 1.11 or later is required, because the module uses the write-only `ignore_body_changes` argument of AzAPI to protect the security rules.
+
+## Upgrading from a version that used the AzureRM provider
+
+Versions up to 0.5.x managed the network security group with the AzureRM provider. This version uses AzAPI and includes `moved` blocks, so the network security group, its security rules, lock, role assignments and diagnostic settings move to their AzAPI addresses without being recreated.
+
+1. Replace `resource_group_name` with `parent_id`, the resource ID of the resource group:
+
+   ```hcl
+   parent_id = "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>"
+   ```
+
+1. Run `terraform init -upgrade`, then `terraform plan`.
+1. Expect in-place updates while AzAPI takes over the existing resources, and new `random_uuid` resources when role assignments are configured. Nothing should be destroyed or replaced; do not apply a plan that destroys or replaces any of these resources.
+1. Apply the plan. A second plan reports no changes.
+
+Two cases need extra steps:
+
+- **`ReadOnly` lock.** The upgrade updates the network security group and its rules in place, which a `ReadOnly` lock blocks. Before upgrading, apply your configuration with `lock = null` using the old version, then upgrade and restore the lock.
+- **Cross-tenant role assignments** (those that set `delegated_managed_identity_resource_id`, for example with Azure Lighthouse). The AzureRM provider stored their ID with a `|<tenant-id>` suffix that the `moved` block cannot convert. Before planning, remove each one from the state, then import it at its new address with an `import` block in your root module:
+
+  ```pwsh
+  terraform state rm 'module.<module-name>.azurerm_role_assignment.this["<key>"]'
+  ```
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.role_assignments["<key>"]
+    id = "<role assignment resource ID, without the |<tenant-id> suffix>"
+  }
+  ```
+
+The `security_rules` output keeps the attribute names it returned before, but it is now built from the module inputs and the resource IDs, so it no longer includes the `timeouts` attribute.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11, < 2.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -24,14 +58,15 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_network_security_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
-- [azurerm_network_security_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.security_rules](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -51,9 +86,11 @@ Description: (Required) Specifies the name of the network security group. Changi
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: (Required) The name of the resource group in which to create the network security group. Changing this forces a new resource to be created.
+Description: The fully-qualified ARM resource ID of the existing resource group into which the network security group will be deployed, for example `/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example-rg`. Changing this forces a new resource to be created.
+
+This module does not create the resource group.
 
 Type: `string`
 
@@ -68,7 +105,7 @@ Description: A map of diagnostic settings to create on the Network Security Grou
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
 - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`. Network security groups do not emit metrics, so this value is not used.
 - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
 - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
 - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
@@ -105,19 +142,95 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_ignore_body_changes"></a> [ignore\_body\_changes](#input\_ignore\_body\_changes)
+
+Description: Paths in each resource's `body` whose changes the AzAPI provider ignores. Prefer Terraform's `lifecycle.ignore_changes` when the paths are static; use this variable when the paths must be derived from variables or other non-static values.
+
+Paths use dot notation, for example `properties.sku.name`. Individual list items cannot be targeted — ignore the whole list property instead. Configuration changes at an ignored path are **not** sent to Azure until that path is removed from the list.
+
+Supplying a non-empty value requires Terraform 1.11 or later, because `ignore_body_changes` is a write-only argument. Changes take effect only after an apply, because the value is held in provider-private state.
+
+- `authorization_locks` - Ignored body paths for the management lock.
+- `authorization_role_assignments` - Ignored body paths for the role assignments.
+- `insights_diagnostic_settings` - Ignored body paths for the diagnostic settings.
+- `network_network_security_groups` - Ignored body paths for the network security group. `properties.securityRules` and `properties.flushConnection` are always ignored in addition to these paths, so that updating the network security group never removes security rules that are managed as separate resources, whether by this module or by others, and never resets connection flushing.
+- `network_network_security_groups_security_rules` - Ignored body paths for the security rules.
+
+Type:
+
+```hcl
+object({
+    authorization_locks                            = optional(list(string), [])
+    authorization_role_assignments                 = optional(list(string), [])
+    insights_diagnostic_settings                   = optional(list(string), [])
+    network_network_security_groups                = optional(list(string), [])
+    network_network_security_groups_security_rules = optional(list(string), [])
+  })
+```
+
+Default: `{}`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
 
 - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
 - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+- `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
 
 Type:
 
 ```hcl
 object({
-    kind = string
-    name = optional(string, null)
+    kind  = string
+    name  = optional(string, null)
+    notes = optional(string, null)
+  })
+```
+
+Default: `null`
+
+### <a name="input_resource_types"></a> [resource\_types](#input\_resource\_types)
+
+Description: AzAPI resource types and API versions used by the module, in `<provider>/<resource>@<api-version>` form. Each key defaults to a tested value; supply only the keys you want to override, for example to target a sovereign cloud that serves older API versions.
+
+- `authorization_locks` - The management lock.
+- `authorization_role_assignments` - The role assignments.
+- `insights_diagnostic_settings` - The diagnostic settings. The default is a preview version because the stable version does not support log category groups.
+- `network_network_security_groups` - The network security group.
+- `network_network_security_groups_security_rules` - The security rules.
+
+Type:
+
+```hcl
+object({
+    authorization_locks                            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    authorization_role_assignments                 = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    insights_diagnostic_settings                   = optional(string, "Microsoft.Insights/diagnosticSettings@2021-05-01-preview")
+    network_network_security_groups                = optional(string, "Microsoft.Network/networkSecurityGroups@2024-10-01")
+    network_network_security_groups_security_rules = optional(string, "Microsoft.Network/networkSecurityGroups/securityRules@2024-10-01")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_retry"></a> [retry](#input\_retry)
+
+Description: Retry configuration applied to every `azapi` resource managed by the module. Defaults to `null` (no custom retry).
+
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+
+See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
+
+Type:
+
+```hcl
+object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
   })
 ```
 
@@ -127,10 +240,10 @@ Default: `null`
 
 Description: A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. A name is matched, ignoring case, against the role definitions that can be assigned in the resource group. For a custom role that can only be assigned on this network security group, use its ID.
 - `principal_id` - The ID of the principal to assign the role to.
 - `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+- `skip_service_principal_aad_check` - If set to true and `principal_type` is not set, `principal_type` is set to `ServicePrincipal`, which skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
 - `condition` - The condition which will be used to scope the role assignment.
 - `condition_version` - The version of the condition syntax. Valid values are '2.0'.
 - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
@@ -175,11 +288,11 @@ Description:  - `access` - (Required) Specifies whether network traffic is allow
  - `source_port_ranges` - (Optional) List of source ports or port ranges. This is required if `source_port_range` is not specified.
 
  ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Network Security Rule.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Network Security Rule.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Rule.
- - `update` - (Defaults to 30 minutes) Used when updating the Network Security Rule.
+ `timeouts` - (Optional) Per-operation timeouts for this rule, each a Go duration string (e.g. `30m`). When set, they replace `var.timeouts` for this rule.
+ - `create` - (Optional) Timeout for create operations.
+ - `delete` - (Optional) Timeout for delete operations.
+ - `read` - (Optional) Timeout for read operations.
+ - `update` - (Optional) Timeout for update operations.
 
 ---  
 Also accepts `null` as an input, which the module evaluates to an empty object (`{}`). This is useful when conditionally creating NSG's using this module.
@@ -225,19 +338,21 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: - `create` - (Defaults to 30 minutes) Used when creating the Network Security Group.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Network Security Group.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Group.
-- `update` - (Defaults to 30 minutes) Used when updating the Network Security Group.
+Description: Default per-operation timeouts applied to every `azapi` resource managed by the module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`). A security rule's own `timeouts` take precedence for that rule.
+
+- `create` - (Optional) Timeout for create operations.
+- `read`   - (Optional) Timeout for read operations.
+- `update` - (Optional) Timeout for update operations.
+- `delete` - (Optional) Timeout for delete operations.
 
 Type:
 
 ```hcl
 object({
     create = optional(string)
-    delete = optional(string)
     read   = optional(string)
     update = optional(string)
+    delete = optional(string)
   })
 ```
 
@@ -257,11 +372,19 @@ Description: The id of the Network Security Group resource
 
 ### <a name="output_security_rules"></a> [security\_rules](#output\_security\_rules)
 
-Description: The Network Security Group Rules
+Description: The security rules managed by this module, keyed like `var.security_rules`. Each value keeps the attribute names of the
+`azurerm_network_security_rule` resource returned by earlier versions of this module. Unset list attributes are returned  
+as empty lists.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
+
+Source: Azure/avm-utl-interfaces/azure
+
+Version: 0.7.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

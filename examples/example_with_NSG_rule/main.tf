@@ -1,11 +1,7 @@
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.11, < 2.0"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -13,15 +9,14 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {}
-}
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.3.0"
+  source  = "Azure/avm-utl-regions/azurerm"
+  version = "0.12.0"
+
+  enable_telemetry = var.enable_telemetry
+  is_recommended   = true
 }
 
 # This allows us to randomize the region for the resource group.
@@ -35,13 +30,17 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.3.0"
+  version = "0.4.4"
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
-  name     = module.naming.resource_group.name_unique
+module "resource_group" {
+  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version = "0.4.0"
+
+  location         = module.regions.regions[random_integer.region_index.result].name
+  name             = module.naming.resource_group.name_unique
+  enable_telemetry = var.enable_telemetry
 }
 
 locals {
@@ -75,12 +74,11 @@ locals {
 module "nsg" {
   source = "../../"
 
-  location = azurerm_resource_group.this.location
-  name     = module.naming.network_security_group.name_unique
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry    = var.enable_telemetry
-  security_rules      = local.nsg_rules
+  location         = module.resource_group.location
+  name             = module.naming.network_security_group.name_unique
+  parent_id        = module.resource_group.resource_id
+  enable_telemetry = var.enable_telemetry
+  security_rules   = local.nsg_rules
   tags = {
     env = "test"
   }
