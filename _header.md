@@ -19,7 +19,7 @@ Versions up to 0.5.x managed the network security group with the AzureRM provide
    ```
 
 1. Run `terraform init -upgrade`, then `terraform plan`.
-1. Expect in-place updates while AzAPI takes over the existing resources, and new `random_uuid` resources when role assignments are configured. Nothing should be destroyed or replaced; do not apply a plan that destroys or replaces any of these resources.
+1. Expect in-place updates while AzAPI takes over the existing resources, plus new `random_uuid` resources when role assignments are configured and a new `time_sleep` resource when a lock is configured. Nothing should be destroyed or replaced; do not apply a plan that destroys or replaces any of these resources.
 1. Apply the plan. A second plan reports no changes.
 
 Two cases need extra steps:

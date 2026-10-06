@@ -20,7 +20,7 @@ Versions up to 0.5.x managed the network security group with the AzureRM provide
    ```
 
 1. Run `terraform init -upgrade`, then `terraform plan`.
-1. Expect in-place updates while AzAPI takes over the existing resources, and new `random_uuid` resources when role assignments are configured. Nothing should be destroyed or replaced; do not apply a plan that destroys or replaces any of these resources.
+1. Expect in-place updates while AzAPI takes over the existing resources, plus new `random_uuid` resources when role assignments are configured and a new `time_sleep` resource when a lock is configured. Nothing should be destroyed or replaced; do not apply a plan that destroys or replaces any of these resources.
 1. Apply the plan. A second plan reports no changes.
 
 Two cases need extra steps:
@@ -54,6 +54,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.13)
+
 ## Resources
 
 The following resources are used by this module:
@@ -65,6 +67,7 @@ The following resources are used by this module:
 - [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [time_sleep.lock_removal](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)

@@ -92,7 +92,20 @@ resource "azapi_resource" "lock" {
   }
 
   # Create the lock last and remove it first. A ReadOnly lock blocks changes to the child resources.
+  depends_on = [time_sleep.lock_removal]
+}
+
+# Azure keeps enforcing a deleted lock for a few seconds, and the AzureRM provider waited for the lock
+# to be gone before it continued. This pause does the same: it is destroyed after the lock and before
+# the network security group and the resources under it, so they are not deleted while the lock
+# still applies.
+resource "time_sleep" "lock_removal" {
+  count = var.lock != null ? 1 : 0
+
+  destroy_duration = "30s"
+
   depends_on = [
+    azapi_resource.this,
     azapi_resource.diagnostic_settings,
     azapi_resource.role_assignments,
     azapi_resource.security_rules,

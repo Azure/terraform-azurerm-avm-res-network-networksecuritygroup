@@ -26,6 +26,7 @@ mock_provider "azapi" {
 }
 mock_provider "modtm" {}
 mock_provider "random" {}
+mock_provider "time" {}
 
 variables {
   location  = "westus2"
@@ -49,7 +50,7 @@ run "defaults" {
     error_message = "The network security group body should carry only the empty securityRules placeholder."
   }
   assert {
-    condition     = length(azapi_resource.security_rules) + length(azapi_resource.lock) + length(azapi_resource.role_assignments) + length(azapi_resource.diagnostic_settings) == 0
+    condition     = length(azapi_resource.security_rules) + length(azapi_resource.lock) + length(azapi_resource.role_assignments) + length(azapi_resource.diagnostic_settings) + length(time_sleep.lock_removal) == 0
     error_message = "No child or interface resources should be created by default."
   }
   assert {
@@ -169,6 +170,10 @@ run "lock_keeps_the_legacy_notes" {
   assert {
     condition     = azapi_resource.lock[0].body.properties.level == "CanNotDelete" && azapi_resource.lock[0].body.properties.notes == "Cannot delete the resource or its child resources."
     error_message = "The lock should keep the notes earlier versions wrote, so upgrades do not change it."
+  }
+  assert {
+    condition     = time_sleep.lock_removal[0].destroy_duration == "30s"
+    error_message = "Removing the lock should pause before the resources under it are deleted, as the AzureRM provider did."
   }
 }
 
