@@ -43,14 +43,26 @@ variable "security_rules" {
  - `source_port_ranges` - (Optional) List of source ports or port ranges. This is required if `source_port_range` is not specified.
 
  ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Network Security Rule.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Network Security Rule.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Rule.
- - `update` - (Defaults to 30 minutes) Used when updating the Network Security Rule.
+ `timeouts` - (Optional) Per-operation timeouts for this rule, each a Go duration string (e.g. `30m`). When set, they replace `var.timeouts` for this rule.
+ - `create` - (Optional) Timeout for create operations.
+ - `delete` - (Optional) Timeout for delete operations.
+ - `read` - (Optional) Timeout for read operations.
+ - `update` - (Optional) Timeout for update operations.
 
 ---
 Also accepts `null` as an input, which the module evaluates to an empty object (`{}`). This is useful when conditionally creating NSG's using this module.
 
 DESCRIPTION
+
+  validation {
+    condition = alltrue(flatten([
+      for _, rule in(var.security_rules == null ? {} : var.security_rules) : [
+        for id in setunion(
+          rule.source_application_security_group_ids == null ? toset([]) : rule.source_application_security_group_ids,
+          rule.destination_application_security_group_ids == null ? toset([]) : rule.destination_application_security_group_ids,
+        ) : can(provider::azapi::parse_resource_id("Microsoft.Network/applicationSecurityGroups", id))
+      ]
+    ]))
+    error_message = "Each `source_application_security_group_ids` and `destination_application_security_group_ids` entry must be a valid application security group resource ID."
+  }
 }
