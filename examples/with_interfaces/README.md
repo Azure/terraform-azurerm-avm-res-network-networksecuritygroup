@@ -13,6 +13,10 @@ terraform {
       source  = "Azure/azapi"
       version = "~> 2.12"
     }
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -24,8 +28,9 @@ terraform {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.12.0"
+  version = "0.13.0"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
   is_recommended   = true
 }
@@ -40,14 +45,15 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.4"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is required for resource modules
 module "resource_group" {
-  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
-  version = "0.4.0"
+  source    = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version   = "0.4.0"
+  providers = { modtm = modtm }
 
   location         = module.regions.regions[random_integer.region_index.result].name
   name             = module.naming.resource_group.name_unique
@@ -84,6 +90,9 @@ resource "azapi_resource" "application_security_group" {
 # This is the module call
 module "nsg" {
   source = "../../"
+  providers = {
+    azapi = azapi
+  }
 
   location  = module.resource_group.location
   name      = module.naming.network_security_group.name_unique
@@ -142,6 +151,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Resources
@@ -172,6 +183,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
+
 ## Outputs
 
 The following outputs are exported:
@@ -190,9 +209,9 @@ The following Modules are called:
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.4.4
+Version: 0.2.0
 
 ### <a name="module_nsg"></a> [nsg](#module\_nsg)
 
@@ -204,7 +223,7 @@ Version:
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: 0.12.0
+Version: 0.13.0
 
 ### <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group)
 
