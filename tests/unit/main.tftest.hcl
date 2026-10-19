@@ -6,9 +6,10 @@ mock_provider "azapi" {
   }
   mock_data "azapi_client_config" {
     defaults = {
-      object_id       = "11111111-1111-1111-1111-111111111111"
-      subscription_id = "00000000-0000-0000-0000-000000000000"
-      tenant_id       = "00000000-0000-0000-0000-000000000001"
+      object_id                = "11111111-1111-1111-1111-111111111111"
+      subscription_id          = "00000000-0000-0000-0000-000000000000"
+      tenant_id                = "00000000-0000-0000-0000-000000000001"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
     }
   }
   mock_data "azapi_resource_list" {
@@ -24,8 +25,9 @@ mock_provider "azapi" {
     }
   }
 }
-mock_provider "modtm" {}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -57,6 +59,11 @@ run "defaults" {
     condition     = output.resource_id == azapi_resource.this.id && output.name == azapi_resource.this.name
     error_message = "resource_id and name outputs should come from the network security group."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "null_security_rules" {
@@ -69,6 +76,11 @@ run "null_security_rules" {
   assert {
     condition     = length(azapi_resource.security_rules) == 0 && length(output.security_rules) == 0
     error_message = "A null security_rules input should create no rules."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -152,6 +164,11 @@ run "security_rules_map_to_the_arm_body" {
     condition     = length(output.security_rules["deny"].source_port_ranges) == 0 && length(output.security_rules["web"].destination_port_ranges) == 2
     error_message = "The security_rules output should return unset list attributes as empty lists."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "lock_keeps_the_legacy_notes" {
@@ -175,6 +192,11 @@ run "lock_keeps_the_legacy_notes" {
     condition     = time_sleep.lock_removal[0].destroy_duration == "30s"
     error_message = "Removing the lock should pause before the resources under it are deleted, as the AzureRM provider did."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "lock_with_custom_notes" {
@@ -191,6 +213,11 @@ run "lock_with_custom_notes" {
   assert {
     condition     = azapi_resource.lock[0].name == "lock-custom" && azapi_resource.lock[0].body.properties.notes == "Managed by the platform team."
     error_message = "Custom lock name and notes should be used."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -227,6 +254,11 @@ run "role_assignment_by_role_name" {
     condition     = data.azapi_resource_list.role_definitions[0].parent_id == var.parent_id
     error_message = "Role definitions should be listed in the resource group, so the lookup does not wait for changes to the network security group."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "role_assignment_by_tenant_level_id" {
@@ -249,6 +281,11 @@ run "role_assignment_by_tenant_level_id" {
     condition     = azapi_resource.role_assignments["network_contributor"].body.properties.principalType == null
     error_message = "The principal type should be left to Azure when it is not set."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "role_assignment_with_unknown_role_name" {
@@ -266,6 +303,11 @@ run "role_assignment_with_unknown_role_name" {
   }
 
   expect_failures = [azapi_resource.role_assignments]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "diagnostic_settings_mapping" {
@@ -302,6 +344,11 @@ run "diagnostic_settings_mapping" {
     condition     = !can(azapi_resource.diagnostic_settings["law"].body.properties.metrics)
     error_message = "Network security groups emit no metrics, so none should be sent."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "resource_types_override" {
@@ -317,6 +364,11 @@ run "resource_types_override" {
     condition     = azapi_resource.this.type == "Microsoft.Network/networkSecurityGroups@2023-11-01"
     error_message = "resource_types should override the network security group API version."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "invalid_parent_id" {
@@ -327,6 +379,11 @@ run "invalid_parent_id" {
   }
 
   expect_failures = [var.parent_id]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "invalid_application_security_group_id" {
@@ -349,6 +406,11 @@ run "invalid_application_security_group_id" {
   }
 
   expect_failures = [var.security_rules]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "invalid_workspace_id" {
@@ -363,4 +425,9 @@ run "invalid_workspace_id" {
   }
 
   expect_failures = [var.diagnostic_settings]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
