@@ -2,10 +2,12 @@ terraform {
   required_version = ">= 1.11, < 2.0"
 
   required_providers {
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
       version = "~> 2.12"
     }
+    # tflint-ignore: terraform_unused_required_providers
     modtm = {
       source  = "registry.terraform.io/azure/modtm"
       version = "~> 0.3"
@@ -22,9 +24,6 @@ terraform {
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.13.0"
-  providers = {
-    azapi = azapi
-  }
 
   location         = var.location
   enable_telemetry = var.enable_telemetry
@@ -47,9 +46,8 @@ module "naming" {
 
 # This is required for resource modules
 module "resource_group" {
-  source    = "Azure/avm-res-resources-resourcegroup/azurerm"
-  version   = "0.4.0"
-  providers = { modtm = modtm }
+  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version = "0.4.0"
 
   location         = module.regions.regions[random_integer.region_index.result].name
   name             = module.naming.resource_group.name_unique
@@ -86,9 +84,6 @@ locals {
 # This is the module call
 module "nsg" {
   source = "../../"
-  providers = {
-    azapi = azapi
-  }
 
   location         = module.resource_group.location
   name             = module.naming.network_security_group.name_unique
