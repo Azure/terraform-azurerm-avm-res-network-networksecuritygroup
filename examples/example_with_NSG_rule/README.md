@@ -14,11 +14,6 @@ terraform {
       source  = "Azure/azapi"
       version = "~> 2.12"
     }
-    # tflint-ignore: terraform_unused_required_providers
-    modtm = {
-      source  = "registry.terraform.io/azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -30,7 +25,7 @@ terraform {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.13.0"
+  version = "0.13.2"
 
   location         = var.location
   enable_telemetry = var.enable_telemetry
@@ -48,13 +43,13 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/avm-utl-naming/azure"
-  version = "0.2.0"
+  version = "0.3.0"
 }
 
 # This is required for resource modules
 module "resource_group" {
   source  = "Azure/avm-res-resources-resourcegroup/azurerm"
-  version = "0.4.0"
+  version = "0.5.0"
 
   location         = module.regions.regions[random_integer.region_index.result].name
   name             = module.naming.resource_group.name_unique
@@ -112,8 +107,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
-
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Resources
@@ -169,7 +162,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-naming/azure
 
-Version: 0.2.0
+Version: 0.3.0
 
 ### <a name="module_nsg"></a> [nsg](#module\_nsg)
 
@@ -181,13 +174,13 @@ Version:
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: 0.13.0
+Version: 0.13.2
 
 ### <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group)
 
 Source: Azure/avm-res-resources-resourcegroup/azurerm
 
-Version: 0.4.0
+Version: 0.5.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
